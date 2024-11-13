@@ -72,6 +72,41 @@ router_bgp:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
       activate: true
+  vrfs:
+  - name: OVERLAY
+    router_id: 10.250.1.4
+    rd: 10.250.1.4:10
+    route_targets:
+      import:
+      - address_family: evpn
+        route_targets:
+        - '10:10'
+      export:
+      - address_family: evpn
+        route_targets:
+        - '10:10'
+    redistribute_routes:
+    - source_protocol: connected
+    neighbors:
+    - ip_address: 10.252.1.0
+      peer_group: MLAG-IPv4-UNDERLAY-PEER
+  vlans:
+  - id: 10
+    tenant: S1_FABRIC
+    rd: 10.250.1.4:10010
+    route_targets:
+      both:
+      - 10010:10010
+    redistribute_routes:
+    - learned
+  - id: 20
+    tenant: S1_FABRIC
+    rd: 10.250.1.4:10020
+    route_targets:
+      both:
+      - 10020:10020
+    redistribute_routes:
+    - learned
 static_routes:
 - vrf: default
   destination_address_prefix: 0.0.0.0/0
@@ -99,6 +134,9 @@ local_users:
 vrfs:
 - name: default
   ip_routing: false
+- name: OVERLAY
+  tenant: S1_FABRIC
+  ip_routing: true
 management_interfaces:
 - name: Management0
   description: oob_management
@@ -122,6 +160,17 @@ vlans:
   name: MLAG_PEER
   trunk_groups:
   - MLAG
+- id: 10
+  name: Ten
+  tenant: S1_FABRIC
+- id: 20
+  name: Twenty
+  tenant: S1_FABRIC
+- id: 3009
+  name: MLAG_iBGP_OVERLAY
+  trunk_groups:
+  - LEAF_PEER_L3
+  tenant: S1_FABRIC
 vlan_interfaces:
 - name: Vlan4093
   description: MLAG_PEER_L3_PEERING
@@ -134,6 +183,26 @@ vlan_interfaces:
   no_autostate: true
   mtu: 1500
   ip_address: 10.251.1.1/31
+- name: Vlan10
+  tenant: S1_FABRIC
+  description: Ten
+  shutdown: false
+  ip_address_virtual: 10.10.10.1/24
+  vrf: OVERLAY
+- name: Vlan20
+  tenant: S1_FABRIC
+  description: Twenty
+  shutdown: false
+  ip_address_virtual: 10.20.20.1/24
+  vrf: OVERLAY
+- name: Vlan3009
+  tenant: S1_FABRIC
+  type: underlay_peering
+  shutdown: false
+  description: 'MLAG_PEER_L3_iBGP: vrf OVERLAY'
+  vrf: OVERLAY
+  mtu: 1500
+  ip_address: 10.252.1.1/31
 port_channel_interfaces:
 - name: Port-Channel1
   description: MLAG_PEER_s1-leaf1_Po1
@@ -234,5 +303,13 @@ vxlan_interface:
       udp_port: 4789
       source_interface: Loopback1
       virtual_router_encapsulation_mac_address: mlag-system-id
+      vlans:
+      - id: 10
+        vni: 10010
+      - id: 20
+        vni: 10020
+      vrfs:
+      - name: OVERLAY
+        vni: 10
 metadata:
   platform: cEOS
