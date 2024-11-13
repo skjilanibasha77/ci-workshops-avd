@@ -293,6 +293,7 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | MLAG_PEER_s1-leaf1_Ethernet1 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 1 |
+| Ethernet4 | s1-host1_eth2 | *access | *10 | *- | *- | 4 |
 | Ethernet6 | MLAG_PEER_s1-leaf1_Ethernet6 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 1 |
 
 *Inherited from Port-Channel Interface
@@ -327,6 +328,11 @@ interface Ethernet3
    no switchport
    ip address 172.16.1.7/31
 !
+interface Ethernet4
+   description s1-host1_eth2
+   no shutdown
+   channel-group 4 mode active
+!
 interface Ethernet6
    description MLAG_PEER_s1-leaf1_Ethernet6
    no shutdown
@@ -342,6 +348,7 @@ interface Ethernet6
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel1 | MLAG_PEER_s1-leaf1_Po1 | switched | trunk | - | - | ['LEAF_PEER_L3', 'MLAG'] | - | - | - | - |
+| Port-Channel4 | s1-host1 | switched | access | 10 | - | - | - | - | 4 | - |
 
 #### Port-Channel Interfaces Device Configuration
 
@@ -354,6 +361,14 @@ interface Port-Channel1
    switchport mode trunk
    switchport trunk group LEAF_PEER_L3
    switchport trunk group MLAG
+!
+interface Port-Channel4
+   description s1-host1
+   no shutdown
+   switchport
+   switchport access vlan 10
+   mlag 4
+   spanning-tree portfast
 ```
 
 ### Loopback Interfaces
