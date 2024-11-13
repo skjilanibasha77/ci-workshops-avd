@@ -303,6 +303,7 @@ vlan 4094
 | --------- | ----------- | -----| ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
 | Ethernet2 | P2P_LINK_TO_S1-SPINE1_Ethernet8 | routed | - | 172.16.1.21/31 | default | 1500 | False | - | - |
 | Ethernet3 | P2P_LINK_TO_S1-SPINE2_Ethernet8 | routed | - | 172.16.1.23/31 | default | 1500 | False | - | - |
+| Ethernet5 | P2P_LINK_TO_s2-brdr2_Ethernet5 | routed | - | 172.16.255.2/31 | default | 1500 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -326,6 +327,13 @@ interface Ethernet3
    mtu 1500
    no switchport
    ip address 172.16.1.23/31
+!
+interface Ethernet5
+   description P2P_LINK_TO_s2-brdr2_Ethernet5
+   no shutdown
+   mtu 1500
+   no switchport
+   ip address 172.16.255.2/31
 !
 interface Ethernet6
    description MLAG_PEER_s1-brdr1_Ethernet6
@@ -606,6 +614,7 @@ ASN Notation: asplain
 | 10.252.1.8 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | default | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - | - |
 | 172.16.1.20 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
 | 172.16.1.22 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
+| 172.16.255.3 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
 | 10.252.1.8 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | OVERLAY | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
@@ -670,6 +679,9 @@ router bgp 65103
    neighbor 172.16.1.22 peer group IPv4-UNDERLAY-PEERS
    neighbor 172.16.1.22 remote-as 65100
    neighbor 172.16.1.22 description s1-spine2_Ethernet8
+   neighbor 172.16.255.3 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.16.255.3 remote-as 65203
+   neighbor 172.16.255.3 description s2-brdr2
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan 10
