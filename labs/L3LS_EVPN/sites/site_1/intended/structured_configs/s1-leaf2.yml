@@ -107,6 +107,22 @@ router_bgp:
       - 10020:10020
     redistribute_routes:
     - learned
+  - id: 30
+    tenant: S1_FABRIC
+    rd: 10.250.1.4:10030
+    route_targets:
+      both:
+      - 10030:10030
+    redistribute_routes:
+    - learned
+  - id: 40
+    tenant: S1_FABRIC
+    rd: 10.250.1.4:10040
+    route_targets:
+      both:
+      - 10040:10040
+    redistribute_routes:
+    - learned
 static_routes:
 - vrf: default
   destination_address_prefix: 0.0.0.0/0
@@ -166,6 +182,12 @@ vlans:
 - id: 20
   name: Twenty
   tenant: S1_FABRIC
+- id: 30
+  name: Thirty
+  tenant: S1_FABRIC
+- id: 40
+  name: Forty
+  tenant: S1_FABRIC
 - id: 3009
   name: MLAG_iBGP_OVERLAY
   trunk_groups:
@@ -194,6 +216,18 @@ vlan_interfaces:
   description: Twenty
   shutdown: false
   ip_address_virtual: 10.20.20.1/24
+  vrf: OVERLAY
+- name: Vlan30
+  tenant: S1_FABRIC
+  description: Thirty
+  shutdown: false
+  ip_address_virtual: 10.30.30.1/24
+  vrf: OVERLAY
+- name: Vlan40
+  tenant: S1_FABRIC
+  description: Forty
+  shutdown: false
+  ip_address_virtual: 10.40.40.1/24
   vrf: OVERLAY
 - name: Vlan3009
   tenant: S1_FABRIC
@@ -327,6 +361,10 @@ vxlan_interface:
         vni: 10010
       - id: 20
         vni: 10020
+      - id: 30
+        vni: 10030
+      - id: 40
+        vni: 10040
       vrfs:
       - name: OVERLAY
         vni: 10
