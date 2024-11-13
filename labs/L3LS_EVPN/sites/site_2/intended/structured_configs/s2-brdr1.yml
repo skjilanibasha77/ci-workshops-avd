@@ -32,6 +32,13 @@ router_bgp:
     send_community: all
     maximum_routes: 0
     ebgp_multihop: 3
+  - name: EVPN-OVERLAY-CORE
+    type: evpn
+    update_source: Loopback0
+    bfd: true
+    send_community: all
+    maximum_routes: 0
+    ebgp_multihop: 15
   address_family_ipv4:
     peer_groups:
     - name: MLAG-IPv4-UNDERLAY-PEER
@@ -39,6 +46,8 @@ router_bgp:
     - name: IPv4-UNDERLAY-PEERS
       activate: true
     - name: EVPN-OVERLAY-PEERS
+      activate: false
+    - name: EVPN-OVERLAY-CORE
       activate: false
   neighbors:
   - ip_address: 10.252.2.9
@@ -65,6 +74,11 @@ router_bgp:
     peer: s2-spine2
     description: s2-spine2
     remote_as: '65200'
+  - ip_address: 10.250.1.7
+    peer_group: EVPN-OVERLAY-CORE
+    peer: s1-brdr1
+    description: s1-brdr1
+    remote_as: '65103'
   - ip_address: 172.16.255.0
     remote_as: '65103'
     peer: s1-brdr1
@@ -74,8 +88,15 @@ router_bgp:
   - source_protocol: connected
     route_map: RM-CONN-2-BGP
   address_family_evpn:
+    neighbor_default:
+      next_hop_self_received_evpn_routes:
+        enable: true
+        inter_domain: true
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
+      activate: true
+    - name: EVPN-OVERLAY-CORE
+      domain_remote: true
       activate: true
   vrfs:
   - name: OVERLAY
@@ -102,16 +123,28 @@ router_bgp:
     route_targets:
       both:
       - 10010:10010
+      import_export_evpn_domains:
+      - domain: remote
+        route_target: 10010:10010
     redistribute_routes:
     - learned
+    rd_evpn_domain:
+      domain: remote
+      rd: 10.250.2.7:10010
   - id: 20
     tenant: S2_FABRIC
     rd: 10.250.2.7:10020
     route_targets:
       both:
       - 10020:10020
+      import_export_evpn_domains:
+      - domain: remote
+        route_target: 10020:10020
     redistribute_routes:
     - learned
+    rd_evpn_domain:
+      domain: remote
+      rd: 10.250.2.7:10020
 static_routes:
 - vrf: default
   destination_address_prefix: 0.0.0.0/0
